@@ -10,16 +10,15 @@ public class Exchange {
     private long id;
     private String fromCurrency;
     private String toCurrency;
-    private BigDecimal quantity;
-    private BigDecimal totalCalculatedAmount;
+    private float quantity;
+    private float totalCalculatedAmount;
     private Date transactionDate;
 
     public Exchange() {
     }
 
-    public Exchange(Long id, String fromCurrency, String toCurrency, BigDecimal quantity, BigDecimal totalCalculatedAmount, Date transactionDate) {
+    public Exchange(String fromCurrency, String toCurrency, float quantity, float totalCalculatedAmount, Date transactionDate) {
         super();
-        this.id = id;
         this.fromCurrency = fromCurrency;
         this.toCurrency = toCurrency;
         this.quantity = quantity;
@@ -56,20 +55,20 @@ public class Exchange {
     }
 
     @Column(nullable = false)
-    public BigDecimal getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(BigDecimal quantity) {
+    public void setQuantity(float quantity) {
         this.quantity = quantity;
     }
 
     @Column(nullable = false)
-    public BigDecimal getTotalCalculatedAmount() {
+    public float getTotalCalculatedAmount() {
         return totalCalculatedAmount;
     }
 
-    public void setTotalCalculatedAmount(BigDecimal totalCalculatedAmount) {
+    public void setTotalCalculatedAmount(float totalCalculatedAmount) {
         this.totalCalculatedAmount = totalCalculatedAmount;
     }
 
