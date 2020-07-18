@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/exchange")
@@ -33,14 +32,16 @@ public class ExchangeController {
     }
 
     @GetMapping("/listConversions")
-    public ResponseEntity<Optional<Exchange>> listConversions(@RequestParam(name = "transactionId", required = false) Long transactionId,
-                                                              @RequestParam(name = "transactionDate", required = false) String transactionDate) {
+    public ResponseEntity<List<Exchange>> listConversions(@RequestParam(name = "transactionId", required = false) Long transactionId,
+                                                          @RequestParam(name = "transactionDate", required = false) String transactionDate,
+                                                          @RequestParam(name = "pageNo", required = false, defaultValue = "0") int pageNo,
+                                                          @RequestParam(name = "pageSize", required = false, defaultValue = "10") int pageSize) {
         if (transactionId == null) {
-            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionDate(transactionDate));
+            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionDate(transactionDate, pageNo, pageSize));
         } else if (transactionDate == null) {
-            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionId(transactionId));
+            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionId(transactionId, pageNo, pageSize));
         } else {
-            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionIdAndTransactionDate(transactionId, transactionDate));
+            return ResponseEntity.ok(exchangeService.getExchangeListByTransactionIdAndTransactionDate(transactionId, transactionDate, pageNo, pageSize));
         }
     }
 }

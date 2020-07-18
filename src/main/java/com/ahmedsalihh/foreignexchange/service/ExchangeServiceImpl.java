@@ -9,6 +9,9 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -18,11 +21,20 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ExchangeServiceImpl implements ExchangeService {
     private ExchangeRepository exchangeRepository;
+
+    public RestTemplate getRestTemplate() {
+        CloseableHttpClient httpClient = HttpClients.custom()
+                .setSSLHostnameVerifier(new NoopHostnameVerifier())
+                .build();
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        requestFactory.setHttpClient(httpClient);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        return restTemplate;
+    }
 
     @Autowired
     public ExchangeServiceImpl(ExchangeRepository exchangeRepository) {
@@ -33,14 +45,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     public String getExchangeRate(String from, String to) {
         String uri = "https://api.ratesapi.io/api/latest?base=" + from.toUpperCase() + "&symbols=" + to.toUpperCase();
 
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-
-        ResponseEntity<ExchangeRate> result = restTemplate.getForEntity(uri, ExchangeRate.class);
+        ResponseEntity<ExchangeRate> result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
 
         ExchangeRate response = result.getBody();
 
@@ -53,14 +58,7 @@ public class ExchangeServiceImpl implements ExchangeService {
     public Converted convert(Conversion conversion) {
         String uri = "https://api.ratesapi.io/api/latest?base=" + conversion.getSourceCurrency().toUpperCase() + "&symbols=" + conversion.getTargetCurrency().toUpperCase();
 
-        CloseableHttpClient httpClient = HttpClients.custom()
-                .setSSLHostnameVerifier(new NoopHostnameVerifier())
-                .build();
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-        requestFactory.setHttpClient(httpClient);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
-
-        ResponseEntity<ExchangeRate> result = restTemplate.getForEntity(uri, ExchangeRate.class);
+        ResponseEntity<ExchangeRate> result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
 
         ExchangeRate response = result.getBody();
 
@@ -80,34 +78,39 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public Exchange saveExchange(Exchange exchange) {
-        return null;
+    public List<Exchange> getExchangeListByTransactionId(Long transactionId, int pageNo, int pageSize) {
+
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Exchange> pagedResult = exchangeRepository.findById(transactionId, paging);
+        return pagedResult.toList();
     }
 
     @Override
-    public Optional<Exchange> getExchangeListByTransactionId(Long transactionId) {
-        return exchangeRepository.findById(transactionId);
-    }
-
-    @Override
-    public Optional<Exchange> getExchangeListByTransactionDate(String transactionDate) {
+    public List<Exchange> getExchangeListByTransactionDate(String transactionDate, int pageNo, int pageSize) {
         Date date = null;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return exchangeRepository.findByTransactionDate(date);
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Exchange> pagedResult = exchangeRepository.findByTransactionDate(date, paging);
+
+        return pagedResult.toList();
     }
 
     @Override
-    public Optional<Exchange> getExchangeListByTransactionIdAndTransactionDate(Long transactionId, String transactionDate) {
+    public List<Exchange> getExchangeListByTransactionIdAndTransactionDate(Long transactionId, String transactionDate, int pageNo, int pageSize) {
         Date date = null;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        return exchangeRepository.findExchangeListByTransactionIdAndTransactionDate(transactionId, date);
+
+        Pageable paging = PageRequest.of(pageNo, pageSize);
+        Page<Exchange> pagedResult = exchangeRepository.findExchangeListByTransactionIdAndTransactionDate(transactionId, date, paging);
+
+        return pagedResult.toList();
     }
 }
