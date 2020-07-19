@@ -100,12 +100,12 @@ public class ExchangeServiceImpl implements ExchangeService {
     public List<Exchange> getExchangeListByTransactionDate(String transactionDate, int pageNo, int pageSize) throws DateNotRecognizedException {
         Date date;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(transactionDate);
         } catch (ParseException e) {
-            throw new DateNotRecognizedException("Wrong date format");
+            throw new DateNotRecognizedException("Wrong date format. Date should be provided in 'yyyy-MM-dd' format");
         }
         Pageable paging = PageRequest.of(pageNo, pageSize);
-        Page<Exchange> pagedResult = exchangeRepository.findByTransactionDate(date, paging);
+        Page<Exchange> pagedResult = exchangeRepository.findByTransactionDateGreaterThan(date, paging);
 
         return pagedResult.toList();
     }
@@ -114,9 +114,9 @@ public class ExchangeServiceImpl implements ExchangeService {
     public List<Exchange> getExchangeListByTransactionIdAndTransactionDate(Long transactionId, String transactionDate, int pageNo, int pageSize) throws DateNotRecognizedException {
         Date date = null;
         try {
-            date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
+            date = new SimpleDateFormat("yyyy-MM-dd").parse(transactionDate);
         } catch (ParseException e) {
-            throw new DateNotRecognizedException("Wrong date format");
+            throw new DateNotRecognizedException("Wrong date format. Date should be provided in 'yyyy-MM-dd' format");
         }
 
         Pageable paging = PageRequest.of(pageNo, pageSize);

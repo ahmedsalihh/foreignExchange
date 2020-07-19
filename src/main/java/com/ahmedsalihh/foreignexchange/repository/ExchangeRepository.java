@@ -12,10 +12,10 @@ public interface ExchangeRepository extends PagingAndSortingRepository<Exchange,
 
     Page<Exchange> findById(Long id, Pageable paging);
 
-    Page<Exchange> findByTransactionDate(Date date, Pageable paging);
+    Page<Exchange> findByTransactionDateGreaterThan(Date date, Pageable paging);
 
-    @Query(value = "SELECT * FROM Exchange where id = ?1 and transaction_date = ?2",
-            countQuery = "SELECT count(*) FROM Exchange  where id = ?1 and transaction_date = ?2",
+    @Query(value = "SELECT * FROM Exchange where id = ?1 and transaction_date >= ?2",
+            countQuery = "SELECT count(*) FROM Exchange  where id = ?1 and transaction_date >= ?2",
             nativeQuery = true)
     Page<Exchange> findExchangeListByTransactionIdAndTransactionDate(Long transactionId,
                                                                      Date transactionDate,
