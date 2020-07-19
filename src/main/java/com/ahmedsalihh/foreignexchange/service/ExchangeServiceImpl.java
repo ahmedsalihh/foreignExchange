@@ -1,5 +1,7 @@
 package com.ahmedsalihh.foreignexchange.service;
 
+import com.ahmedsalihh.foreignexchange.exception.DateNotRecognizedException;
+import com.ahmedsalihh.foreignexchange.exception.InvalidCurrencyException;
 import com.ahmedsalihh.foreignexchange.model.Conversion;
 import com.ahmedsalihh.foreignexchange.model.Converted;
 import com.ahmedsalihh.foreignexchange.model.Exchange;
@@ -42,10 +44,15 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public String getExchangeRate(String from, String to) {
+    public String getExchangeRate(String from, String to) throws InvalidCurrencyException {
         String uri = "https://api.ratesapi.io/api/latest?base=" + from.toUpperCase() + "&symbols=" + to.toUpperCase();
+        ResponseEntity<ExchangeRate> result = null;
 
-        ResponseEntity<ExchangeRate> result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
+        try {
+            result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
+        } catch (Exception e) {
+            throw new InvalidCurrencyException(e.getMessage());
+        }
 
         ExchangeRate response = result.getBody();
 
@@ -55,10 +62,14 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public Converted convert(Conversion conversion) {
+    public Converted convert(Conversion conversion) throws InvalidCurrencyException {
         String uri = "https://api.ratesapi.io/api/latest?base=" + conversion.getSourceCurrency().toUpperCase() + "&symbols=" + conversion.getTargetCurrency().toUpperCase();
-
-        ResponseEntity<ExchangeRate> result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
+        ResponseEntity<ExchangeRate> result = null;
+        try {
+            result = getRestTemplate().getForEntity(uri, ExchangeRate.class);
+        } catch (Exception e) {
+            throw new InvalidCurrencyException(e.getMessage());
+        }
 
         ExchangeRate response = result.getBody();
 
@@ -86,12 +97,12 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public List<Exchange> getExchangeListByTransactionDate(String transactionDate, int pageNo, int pageSize) {
-        Date date = null;
+    public List<Exchange> getExchangeListByTransactionDate(String transactionDate, int pageNo, int pageSize) throws DateNotRecognizedException {
+        Date date;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new DateNotRecognizedException("Wrong date format");
         }
         Pageable paging = PageRequest.of(pageNo, pageSize);
         Page<Exchange> pagedResult = exchangeRepository.findByTransactionDate(date, paging);
@@ -100,12 +111,12 @@ public class ExchangeServiceImpl implements ExchangeService {
     }
 
     @Override
-    public List<Exchange> getExchangeListByTransactionIdAndTransactionDate(Long transactionId, String transactionDate, int pageNo, int pageSize) {
+    public List<Exchange> getExchangeListByTransactionIdAndTransactionDate(Long transactionId, String transactionDate, int pageNo, int pageSize) throws DateNotRecognizedException {
         Date date = null;
         try {
             date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(transactionDate);
         } catch (ParseException e) {
-            e.printStackTrace();
+            throw new DateNotRecognizedException("Wrong date format");
         }
 
         Pageable paging = PageRequest.of(pageNo, pageSize);
