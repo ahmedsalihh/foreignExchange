@@ -8,3 +8,7 @@
 [DEBUG] 2020-07-21 02:34:47.164 [main] ForeignExchangeApplication - Running with Spring Boot v2.3.1.RELEASE, Spring v5.2.7.RELEASE
 [INFO ] 2020-07-21 02:34:47.165 [main] ForeignExchangeApplication - No active profile set, falling back to default profiles: default
 [INFO ] 2020-07-21 02:34:50.095 [main] ForeignExchangeApplication - Started ForeignExchangeApplication in 3.33 seconds (JVM running for 4.414)
+[INFO ] 2020-07-21 02:39:27.032 [main] ForeignExchangeApplication - Starting ForeignExchangeApplication on ahmedsalihh with PID 16377 (/home/ahmedsalihh/Desktop/workspaces/java/foreignExchange/target/classes started by ahmedsalihh in /home/ahmedsalihh/Desktop/workspaces/java/foreignExchange)
+[DEBUG] 2020-07-21 02:39:27.036 [main] ForeignExchangeApplication - Running with Spring Boot v2.3.1.RELEASE, Spring v5.2.7.RELEASE
+[INFO ] 2020-07-21 02:39:27.037 [main] ForeignExchangeApplication - No active profile set, falling back to default profiles: default
+[INFO ] 2020-07-21 02:39:33.262 [main] ForeignExchangeApplication - Started ForeignExchangeApplication in 6.639 seconds (JVM running for 7.7)
